@@ -1,3 +1,3 @@
 class Sort:
     __permutations = -1
-    __exchanges = -1
+    __comparisons = -1
