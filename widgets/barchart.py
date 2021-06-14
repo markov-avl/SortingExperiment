@@ -20,7 +20,7 @@ class BarChart(QChartView):
         self._chart.legend().setAlignment(Qt.AlignBottom)
 
     def _set_starting_state(self) -> None:
-        self.set_bars('Приветствую!', [100, 1000, 10000], [50, 9, 4], [60, 45, 4])
+        self.set_bars('Приветствую!', [100, 1000, 10000], [10, 50, 100], [7, 39, 85])
 
     def __init_ui(self) -> None:
         self.__set_chart()
@@ -32,6 +32,7 @@ class BarChart(QChartView):
         if len(count) == len(heapsort_values) == len(introsort_values):
             self._chart.setTitle(title)
             self._chart.removeAllSeries()
+            self._chart.removeAxis(self._axis_x)
             if self._series:
                 self._series.clear()
             self._axis_x.clear()
