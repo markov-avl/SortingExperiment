@@ -11,6 +11,7 @@ from actions.generate import Generate
 from actions.show_comparisons import ShowComparisons
 from actions.show_permutations import ShowPermutations
 from actions.show_time import ShowTime
+from toolbar.toolbar import Toolbar
 from widgets.barchart import BarChart
 from windows.experiment import ExperimentWindow
 from windows.generate import GenerateWindow
@@ -24,6 +25,18 @@ class SortingExperiment(QMainWindow):
     _generate_window: GenerateWindow = None
     _experiment_window: ExperimentWindow = None
     _experiment_files: list
+    _experiment_results = {
+        'heapsort': {
+            'permutations': list(),
+            'comparisons': list(),
+            'time': list()
+        },
+        'introsort': {
+            'permutations': list(),
+            'comparisons': list(),
+            'time': list()
+        }
+    }
 
     def __init__(self) -> None:
         super().__init__()
@@ -37,7 +50,7 @@ class SortingExperiment(QMainWindow):
         self.__bar_chart_menu = self.__menu_bar.addMenu('&Гистограмма')
         self.__help_menu = self.__menu_bar.addMenu('&Справка')
         # toolbar
-        self.__toolbar = QToolBar()
+        self.__toolbar = Toolbar()
         # widgets
         self.__bar_chart = BarChart()
         # actions
@@ -61,9 +74,6 @@ class SortingExperiment(QMainWindow):
         self.__bar_chart_menu.addAction(self.__show_time_action)
 
     def __set_toolbar(self) -> None:
-        self.__toolbar.setVisible(True)
-        self.__toolbar.setMovable(False)
-        self.__toolbar.contextMenuEvent = no_action
         self.__toolbar.addAction(self.__generate_action)
         self.__toolbar.addAction(self.__experiment_action)
         self.__toolbar.addSeparator()
@@ -111,6 +121,7 @@ class SortingExperiment(QMainWindow):
         self.setMinimumHeight(self.__min_height)
         self.setWindowTitle('Sorting Experiment')
         self.setWindowIcon(QIcon('icons/main.png'))
+        self.addToolBar(Qt.TopToolBarArea, self.__toolbar)
         self.__set_menu_bar()
         self.__set_toolbar()
         self.__set_status_bar()
