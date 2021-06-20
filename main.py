@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QCloseEvent
-from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar
+from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from actions.clear import Clear
 from actions.exit import Exit
@@ -11,6 +11,7 @@ from actions.generate import Generate
 from actions.show_comparisons import ShowComparisons
 from actions.show_permutations import ShowPermutations
 from actions.show_time import ShowTime
+from experimenter.experimenter import Experimenter
 from toolbar.toolbar import Toolbar
 from widgets.barchart import BarChart
 from windows.experiment import ExperimentWindow
@@ -25,18 +26,7 @@ class SortingExperiment(QMainWindow):
     _generate_window: GenerateWindow = None
     _experiment_window: ExperimentWindow = None
     _experiment_files: list
-    _experiment_results = {
-        'heapsort': {
-            'permutations': list(),
-            'comparisons': list(),
-            'time': list()
-        },
-        'introsort': {
-            'permutations': list(),
-            'comparisons': list(),
-            'time': list()
-        }
-    }
+    _experiment_results = dict()
 
     def __init__(self) -> None:
         super().__init__()
@@ -54,14 +44,17 @@ class SortingExperiment(QMainWindow):
         # widgets
         self.__bar_chart = BarChart()
         # actions
-        self.__clear_action = Clear(self.__bar_chart.clear)
+        self.__clear_action = Clear(self.__clear)
         self.__exit_action = Exit(self.close)
         self.__generate_action = Generate(self._create_generate_window)
         self.__experiment_action = Experiment(self._create_experiment_window)
-        self.__show_permutations_action = ShowPermutations(no_action)  # TODO
-        self.__show_comparisons_action = ShowComparisons(no_action)    # TODO
-        self.__show_time_action = ShowTime(no_action)                  # TODO
-        self.init_ui()
+        self.__show_permutations_action = ShowPermutations(self.__show_experiment_permutations)
+        self.__show_comparisons_action = ShowComparisons(self.__show_experiment_comparisons)
+        self.__show_time_action = ShowTime(self.__show_experiment_time)
+        # objects
+        self.__experimenter = Experimenter()
+        self.__active_experiment = None
+        self.__init_ui()
 
     def __set_menu_bar(self) -> None:
         self.__file_menu.addAction(self.__clear_action)
@@ -109,13 +102,45 @@ class SortingExperiment(QMainWindow):
     def _create_experiment_window(self) -> None:
         if self._experiment_window is None:
             self._experiment_window = ExperimentWindow()
-            self._experiment_files = self._experiment_window.files
+            files = self._experiment_window.files
             del self._experiment_window
+            if len(files):
+                self._experiment_results = self.__experimenter.experiment(files)
+                self._experiment_files = [file[file.rfind('/') + 1:] for file in files]
+                self.__show_experiment_results()
         else:
             # TODO: переключение на окно
             pass
 
-    def init_ui(self) -> None:
+    def __clear(self):
+        self.__bar_chart.clear()
+        self.__set_inactive_bar_chart()
+        self.__active_experiment = None
+
+    def _get_values(self, key) -> dict:
+        return {i: self._experiment_results[i][key] for i in self._experiment_results}
+
+    def __show_experiment_permutations(self) -> None:
+        if self.__active_experiment is not ShowPermutations:
+            self.__bar_chart.set_bars('Перестановки', self._experiment_files, **self._get_values('permutations'))
+            self.__active_experiment = ShowPermutations
+
+    def __show_experiment_comparisons(self) -> None:
+        if self.__active_experiment is not ShowComparisons:
+            self.__bar_chart.set_bars('Сравнения', self._experiment_files, **self._get_values('comparisons'))
+            self.__active_experiment = ShowComparisons
+
+    def __show_experiment_time(self) -> None:
+        if self.__active_experiment is not ShowTime:
+            self.__bar_chart.set_bars('Время', self._experiment_files, **self._get_values('time'))
+            self.__active_experiment = ShowTime
+
+    def __show_experiment_results(self) -> None:
+        self.__active_experiment = None
+        self.__set_active_bar_chart()
+        self.__show_experiment_permutations()
+
+    def __init_ui(self) -> None:
         self.setGeometry(150, 150, self.__min_width, self.__min_height)
         self.setMinimumWidth(self.__min_width)
         self.setMinimumHeight(self.__min_height)

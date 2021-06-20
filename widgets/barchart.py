@@ -18,9 +18,17 @@ class BarChart(QChartView):
         self._chart.setAnimationOptions(QChart.SeriesAnimations)
         self._chart.legend().setVisible(True)
         self._chart.legend().setAlignment(Qt.AlignBottom)
+        self._chart.addAxis(self._axis_x, Qt.AlignBottom)
+        self._chart.addAxis(self._axis_y, Qt.AlignLeft)
 
     def _set_starting_state(self) -> None:
-        self.set_bars('Приветствую!', [100, 1000, 10000], [10, 50, 100], [7, 39, 85])
+        self.set_bars('Приветствую!', [])
+
+    def _reset(self) -> None:
+        self._chart.removeAllSeries()
+        self._chart.removeAxis(self._axis_x)
+        self._series = QBarSeries()
+        self._axis_x.clear()
 
     def __init_ui(self) -> None:
         self.__set_chart()
@@ -28,32 +36,32 @@ class BarChart(QChartView):
         self.setRenderHint(QPainter.Antialiasing)
         self._set_starting_state()
 
-    def set_bars(self, title: str, count: list, heapsort_values: list, introsort_values: list) -> None:
-        if len(count) == len(heapsort_values) == len(introsort_values):
+    def set_bars(self, title: str, experiments: list, **kwargs) -> None:
+        n = len(experiments)
+        for algorithm in kwargs:
+            if n != len(kwargs[algorithm]):
+                break
+        else:
+            self._reset()
             self._chart.setTitle(title)
-            self._chart.removeAllSeries()
-            self._chart.removeAxis(self._axis_x)
-            if self._series:
-                self._series.clear()
-            self._axis_x.clear()
-            self._axis_y.setRange(0, max(*heapsort_values, *introsort_values) if len(count) else 100)
-            if len(count):
-                heapsort = QBarSet('Heapsort')
-                introsort = QBarSet('Introsort')
-                for i in range(len(count)):
-                    heapsort.append(heapsort_values[i])
-                    introsort.append(introsort_values[i])
-                self._series.append(heapsort)
-                self._series.append(introsort)
-
+            if len(experiments):
+                max_ = max(map(max, kwargs.values()))
+                if max_ <= 0:
+                    max_ = 0.1
+            else:
+                max_ = 100
+            self._axis_y.setRange(0, max_)
+            if n:
+                for algorithm in kwargs:
+                    algorithm_ = QBarSet(algorithm)
+                    for i in kwargs[algorithm]:
+                        algorithm_.append(i)
+                    self._series.append(algorithm_)
                 self._chart.addSeries(self._series)
-
-                self._axis_x.append(list(map(str, count)))
+                self._axis_x.append(list(map(str, experiments)))
                 self._chart.addAxis(self._axis_x, Qt.AlignBottom)
                 self._series.attachAxis(self._axis_x)
-
-                self._chart.addAxis(self._axis_y, Qt.AlignLeft)
                 self._series.attachAxis(self._axis_y)
 
     def clear(self) -> None:
-        self.set_bars('Гистограмма очищена', [], [], [])
+        self.set_bars('Гистограмма очищена', [])
