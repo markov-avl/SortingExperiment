@@ -41,7 +41,8 @@ class GenerateWindow(QWidget):
         self._generator = Generator(self)
         self._tests = {
             'Отсортированная': self._generator.generate_sorted,
-            'Отсортированная инвентированная': self._generator.generate_reverse_sorted
+            'Отсортированная инвентированная': self._generator.generate_reverse_sorted,
+            'В случайном порядке': self._generator.generate_random
         }
         self._options = Option(*self._tests.keys())
         self._count = QLabel('Количество элементов:')

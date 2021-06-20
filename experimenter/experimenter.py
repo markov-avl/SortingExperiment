@@ -70,4 +70,4 @@ class Experimenter(QThread):
     @staticmethod
     def get_sequence(file: str) -> list:
         with open(file, 'r') as infile:
-            return list(map(int, infile.read()[1: -1].split(', ')))
+            return list(map(int, infile.read().split(' ')))

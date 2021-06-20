@@ -1,3 +1,5 @@
+from random import randint
+
 from PyQt5.QtWidgets import QFileDialog
 
 
@@ -15,7 +17,7 @@ class Generator:
         if directory:
             path = f'{directory}/{test_name}{len(test)}{self.EXTENSION}'
             with open(path, 'w') as outfile:
-                outfile.write(str(test))
+                outfile.write(' '.join(map(str, test)))
 
     def generate_sorted(self, n: int) -> None:
         test = list(range(n))
@@ -25,3 +27,7 @@ class Generator:
         test = list(range(n))
         test.reverse()
         self.save_test('reverse-sorted-', test)
+
+    def generate_random(self, n: int) -> None:
+        test = [randint(0, 1_000_000) for _ in range(n)]
+        self.save_test('random-', test)
