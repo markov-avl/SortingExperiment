@@ -1,7 +1,8 @@
+from abc import abstractmethod, ABC
 from time import time
 
 
-class Counter:
+class Counter(ABC):
     _permutations = -1
     _comparisons = -1
     _time = -1.0
@@ -25,3 +26,7 @@ class Counter:
 
     def _end(self) -> None:
         self._time = time() - self._time
+
+    @abstractmethod
+    def sort(self, sequence: list, counting: bool = True) -> list:
+        pass

@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
@@ -11,9 +11,9 @@ from actions.generate import Generate
 from actions.show_comparisons import ShowComparisons
 from actions.show_permutations import ShowPermutations
 from actions.show_time import ShowTime
-from experimenter.experimenter import Experimenter
 from toolbar.toolbar import Toolbar
 from widgets.barchart import BarChart
+from windows.get_files import GetFilesWindow
 from windows.experiment import ExperimentWindow
 from windows.generate import GenerateWindow
 
@@ -23,7 +23,9 @@ def no_action(*args, **kwargs) -> None:
 
 
 class SortingExperiment(QMainWindow):
+    _on_experiment_ended = pyqtSignal(dict)
     _generate_window: GenerateWindow = None
+    _get_files_window: GetFilesWindow = None
     _experiment_window: ExperimentWindow = None
     _experiment_files: list
     _experiment_results = dict()
@@ -47,13 +49,14 @@ class SortingExperiment(QMainWindow):
         self.__clear_action = Clear(self.__clear)
         self.__exit_action = Exit(self.close)
         self.__generate_action = Generate(self._create_generate_window)
-        self.__experiment_action = Experiment(self._create_experiment_window)
+        self.__experiment_action = Experiment(self._create_get_files_window)
         self.__show_permutations_action = ShowPermutations(self.__show_experiment_permutations)
         self.__show_comparisons_action = ShowComparisons(self.__show_experiment_comparisons)
         self.__show_time_action = ShowTime(self.__show_experiment_time)
         # objects
-        self.__experimenter = Experimenter()
         self.__active_experiment = None
+        # signals
+        self._on_experiment_ended.connect(self.__show_experiment_results)
         self.__init_ui()
 
     def __set_menu_bar(self) -> None:
@@ -92,25 +95,38 @@ class SortingExperiment(QMainWindow):
         self.__show_time_action.setEnabled(False)
 
     def _create_generate_window(self) -> None:
+        if self._generate_window is not None:
+            if self._generate_window.isVisible():
+                # TODO: переключение на окно
+                return
+            else:
+                del self._generate_window
         if self._generate_window is None:
             self._generate_window = GenerateWindow()
-        else:
-            # TODO: переключение на окно
-            pass
-        self._generate_window.show()
+            self._generate_window.show()
 
-    def _create_experiment_window(self) -> None:
-        if self._experiment_window is None:
-            self._experiment_window = ExperimentWindow()
-            files = self._experiment_window.files
-            del self._experiment_window
-            if len(files):
-                self._experiment_results = self.__experimenter.experiment(files)
-                self._experiment_files = [file[file.rfind('/') + 1:] for file in files]
-                self.__show_experiment_results()
-        else:
-            # TODO: переключение на окно
-            pass
+    def _create_get_files_window(self) -> None:
+        if self._get_files_window is not None:
+            if self._get_files_window.isVisible():
+                # TODO: переключение на окно
+                return
+            else:
+                del self._get_files_window
+        if self._experiment_window is not None:
+            if self._experiment_window.isVisible():
+                # TODO: переключение на окно
+                return
+            else:
+                del self._experiment_window
+        if self._get_files_window is None and self._experiment_window is None:
+            self._get_files_window = GetFilesWindow()
+            if len(self._get_files_window.files):
+                self._create_experiment_window(self._get_files_window.files.copy())
+
+    def _create_experiment_window(self, files: list) -> None:
+        self._experiment_window = ExperimentWindow(files, self._on_experiment_ended)
+        self._experiment_window.show()
+        self._experiment_window.experiment()
 
     def __clear(self):
         self.__bar_chart.clear()
@@ -135,7 +151,12 @@ class SortingExperiment(QMainWindow):
             self.__bar_chart.set_bars('Время', self._experiment_files, **self._get_values('time'))
             self.__active_experiment = ShowTime
 
-    def __show_experiment_results(self) -> None:
+    def __show_experiment_results(self, results: dict) -> None:
+        self._experiment_results = results
+        self._experiment_files = [file[file.rfind('/') + 1:] for file in self._get_files_window.files]
+        self._experiment_window.close()
+        del self._get_files_window
+        del self._experiment_window
         self.__active_experiment = None
         self.__set_active_bar_chart()
         self.__show_experiment_permutations()

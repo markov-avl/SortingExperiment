@@ -36,8 +36,8 @@ class Option(QWidget):
 
 
 class GenerateWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._generator = Generator(self)
         self._tests = {
             'Отсортированная': self._generator.generate_sorted,
@@ -70,3 +70,6 @@ class GenerateWindow(QWidget):
 
     def _generate_and_save_test(self) -> None:
         self._tests[self._options.option.text()](self._amount.value())
+
+    def close(self) -> bool:
+        pass
