@@ -31,3 +31,40 @@ class Generator:
     def generate_random(self, n: int) -> None:
         test = [randint(0, 1_000_000) for _ in range(n)]
         self.save_test('random-', test)
+
+    def generate_repetitive(self, n: int) -> None:
+        test = [n] * n
+        self.save_test('repetitive-', test)
+
+    def generate_partially_sorted(self, n: int, length: int = None) -> None:
+        test = list()
+        if 1 > length or length > 1_000_000:
+            length = randint(0, 32) + 1
+        while len(test) < n:
+            start = randint(0, 1_000_000)
+            test.extend([start := start + randint(0, 100) for _ in range(length)])
+        test = test[: n]
+        self.save_test(f'{length}-partially-sorted-', test)
+
+    def generate_partially_reverse_sorted(self, n: int, length: int = None) -> None:
+        test = list()
+        if 1 > length or length > 1_000_000:
+            length = randint(1, 32)
+        while len(test) < n:
+            start = randint(0, 1_000_000)
+            test.extend([start := start - randint(0, 100) for _ in range(length)])
+        test = test[: n]
+        self.save_test(f'{length}-partially-reverse-sorted-', test)
+
+    def generate_partially_sorted_and_reverse_sorted(self, n: int, length: int = None) -> None:
+        test = list()
+        if 1 > length or length > 1_000_000:
+            length = randint(1, 32)
+        while len(test) < n:
+            start = randint(0, 1_000_000)
+            if randint(0, 1):
+                test.extend([start := start - randint(0, 100) for _ in range(length)])
+            else:
+                test.extend([start := start + randint(0, 100) for _ in range(length)])
+        test = test[: n]
+        self.save_test(f'{length}-partially-sorted-and-reverse-sorted-', test)

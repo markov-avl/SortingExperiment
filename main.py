@@ -40,7 +40,7 @@ class SortingExperiment(QMainWindow):
         self.__file_menu = self.__menu_bar.addMenu('&Файл')
         self.__run_menu = self.__menu_bar.addMenu('&Выполнить')
         self.__bar_chart_menu = self.__menu_bar.addMenu('&Гистограмма')
-        self.__help_menu = self.__menu_bar.addMenu('&Справка')
+        # self.__help_menu = self.__menu_bar.addMenu('&Справка')
         # toolbar
         self.__toolbar = Toolbar()
         # widgets

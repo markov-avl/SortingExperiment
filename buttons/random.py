@@ -3,10 +3,10 @@ from typing import Callable
 from PyQt5.QtWidgets import QPushButton
 
 
-class CancelButton(QPushButton):
+class RandomButton(QPushButton):
     def __init__(self, function: Callable, parent=None) -> None:
         super().__init__(parent)
-        self.setText('Отмена')
+        self.setText('Случайное число')
         self.setStyleSheet('font-size: 8pt;')
-        self.setFixedSize(70, 30)
+        self.setFixedSize(100, 25)
         self.clicked.connect(function)

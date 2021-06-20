@@ -8,4 +8,5 @@ class Amount(QSpinBox):
         self.setSingleStep(1)
         self.setLineEdit(QLineEdit())
         self.setStyleSheet('font-size: 8pt;')
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.setFixedHeight(25)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

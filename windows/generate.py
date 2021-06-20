@@ -1,10 +1,11 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QButtonGroup, QRadioButton, QLabel
 
 from buttons.generate import GenerateButton
 from generator.generator import Generator
 from widgets.amount import Amount
-
+from widgets.partialness import Partialness
 
 STYLESHEET = 'font-size: 8pt;'
 
@@ -12,16 +13,32 @@ STYLESHEET = 'font-size: 8pt;'
 class Option(QWidget):
     def __init__(self, *args, parent=None) -> None:
         super().__init__(parent=parent)
-        self._layout = QVBoxLayout(self)
-        self._group = QButtonGroup(self)
-        self._options = [QRadioButton(option, self) for option in args]
+        self._index = 0
+        self._names = args
+        self._layout = QVBoxLayout()
+        self._group = QButtonGroup()
+        self._options = [QRadioButton(option) for option in self._names]
+        self.partialness = Partialness()
         self._init_ui()
 
     @property
     def option(self) -> QRadioButton:
         return self._group.checkedButton()
 
+    def on_click(self) -> None:
+        index = self._names.index(self.option.text())
+        if index != self._index:
+            if 4 <= index <= 6:
+                self._layout.insertWidget(index + 1, self.partialness)
+                self.partialness.reset()
+            else:
+                self.partialness.setHidden(True)
+                self._layout.removeWidget(self.partialness)
+            self._index = index
+
     def _set_checkboxes(self) -> None:
+        for option in self._options:
+            option.clicked.connect(self.on_click)
         if len(self._options):
             self._options[0].setChecked(True)
 
@@ -41,8 +58,13 @@ class GenerateWindow(QWidget):
         self._generator = Generator(self)
         self._tests = {
             'Отсортированная': self._generator.generate_sorted,
-            'Отсортированная инвентированная': self._generator.generate_reverse_sorted,
-            'В случайном порядке': self._generator.generate_random
+            'Отсортированная убывающе': self._generator.generate_reverse_sorted,
+            'В случайном порядке': self._generator.generate_random,
+            'Повторяющееся число': self._generator.generate_repetitive,
+            'Частично отсортированная': self._generator.generate_partially_sorted,
+            'Частично отсортированная убывающе': self._generator.generate_partially_reverse_sorted,
+            'Частично отсортированная и отсортированная убывающе':
+                self._generator.generate_partially_sorted_and_reverse_sorted
         }
         self._options = Option(*self._tests.keys())
         self._count = QLabel('Количество элементов:')
@@ -52,10 +74,10 @@ class GenerateWindow(QWidget):
         self._init_ui()
 
     def _set_layout(self) -> None:
-        self._layout.addWidget(self._options)
-        self._layout.addWidget(self._count)
-        self._layout.addWidget(self._amount)
-        self._layout.addWidget(self._generate_button)
+        self._layout.addWidget(self._options, 0)
+        self._layout.addWidget(self._count, 1, alignment=Qt.AlignBottom)
+        self._layout.addWidget(self._amount, 2)
+        self._layout.addWidget(self._generate_button, 3)
 
     def _set_count(self) -> None:
         self._count.setStyleSheet(STYLESHEET)
@@ -65,12 +87,16 @@ class GenerateWindow(QWidget):
         self._set_layout()
         self.setWindowTitle('Генерация')
         self.setStyleSheet('font-size: 12pt;')
-        self.setFixedSize(300, 200)
+        self.setFixedSize(340, 305)
         self.setWindowIcon(QIcon('icons/generate.png'))
         self.setLayout(self._layout)
 
     def _generate_and_save_test(self) -> None:
-        self._tests[self._options.option.text()](self._amount.value())
+        index = list(self._tests.keys()).index(self._options.option.text())
+        if 4 <= index <= 6:
+            self._tests[self._options.option.text()](self._amount.value(), self._options.partialness.value())
+        else:
+            self._tests[self._options.option.text()](self._amount.value())
 
     def close(self) -> bool:
         pass

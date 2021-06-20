@@ -25,8 +25,8 @@ class ExperimentWindow(QWidget):
         self._init_ui()
 
     def _set_layouts(self) -> None:
-        self._upper_layout.addWidget(self._loading, 0, alignment=Qt.AlignLeft)
-        self._upper_layout.addWidget(self._state, 1, alignment=Qt.AlignLeft)
+        self._upper_layout.addWidget(self._loading, 0)
+        self._upper_layout.addWidget(self._state, 1)
         self._main_layout.addLayout(self._upper_layout)
         self._main_layout.addWidget(self._cancel, alignment=Qt.AlignRight)
 
@@ -38,7 +38,7 @@ class ExperimentWindow(QWidget):
         self._set_state()
         self._set_layouts()
         self.setWindowTitle('Эксперимент')
-        self.setFixedSize(250, 120)
+        self.setFixedSize(350, 120)
         self.setWindowIcon(QIcon('icons/experiment.png'))
         self.setLayout(self._main_layout)
 
