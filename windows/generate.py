@@ -57,14 +57,13 @@ class GenerateWindow(QWidget):
         super().__init__(parent)
         self._generator = Generator(self)
         self._tests = {
-            'Отсортированная': self._generator.generate_sorted,
-            'Отсортированная убывающе': self._generator.generate_reverse_sorted,
+            'Возрастающая': self._generator.generate_sorted,
+            'Убывающая': self._generator.generate_reverse_sorted,
             'В случайном порядке': self._generator.generate_random,
             'Повторяющееся число': self._generator.generate_repetitive,
-            'Частично отсортированная': self._generator.generate_partially_sorted,
-            'Частично отсортированная убывающе': self._generator.generate_partially_reverse_sorted,
-            'Частично отсортированная и отсортированная убывающе':
-                self._generator.generate_partially_sorted_and_reverse_sorted
+            'Частично возрастающая': self._generator.generate_partially_sorted,
+            'Частично убывающая': self._generator.generate_partially_reverse_sorted,
+            'Частично возрастающая и убывающая': self._generator.generate_partially_sorted_and_reverse_sorted
         }
         self._options = Option(*self._tests.keys())
         self._count = QLabel('Количество элементов:')
@@ -87,7 +86,7 @@ class GenerateWindow(QWidget):
         self._set_layout()
         self.setWindowTitle('Генерация')
         self.setStyleSheet('font-size: 12pt;')
-        self.setFixedSize(340, 305)
+        self.setFixedSize(250, 305)
         self.setWindowIcon(QIcon('icons/generate.png'))
         self.setLayout(self._layout)
 
