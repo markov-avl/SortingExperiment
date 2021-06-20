@@ -72,13 +72,10 @@ class IntroSort(Counter):
             while array[i] < pivot:
                 self._comparisons += 1
                 i += 1
-            self._comparisons += 1
             j -= 1
             while pivot < array[j]:
                 self._comparisons += 1
                 j -= 1
-            self._comparisons += 1
-            self._comparisons += 1
             if i >= j:
                 return i
             array[i], array[j] = array[j], array[i]
