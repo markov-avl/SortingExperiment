@@ -8,5 +8,5 @@ class RandomButton(QPushButton):
         super().__init__(parent)
         self.setText('Случайное число')
         self.setStyleSheet('font-size: 8pt;')
-        self.setFixedSize(100, 25)
+        self.setFixedSize(150, 25)
         self.clicked.connect(function)

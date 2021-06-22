@@ -86,7 +86,7 @@ class GenerateWindow(QWidget):
         self._set_layout()
         self.setWindowTitle('Генерация')
         self.setStyleSheet('font-size: 12pt;')
-        self.setFixedSize(250, 305)
+        self.setFixedSize(350, 350)
         self.setWindowIcon(QIcon('icons/generate.png'))
         self.setLayout(self._layout)
 

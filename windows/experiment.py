@@ -38,7 +38,7 @@ class ExperimentWindow(QWidget):
         self._set_state()
         self._set_layouts()
         self.setWindowTitle('Эксперимент')
-        self.setFixedSize(350, 120)
+        self.setFixedSize(400, 150)
         self.setWindowIcon(QIcon('icons/experiment.png'))
         self.setLayout(self._main_layout)
 

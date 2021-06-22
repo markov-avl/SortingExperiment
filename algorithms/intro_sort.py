@@ -6,13 +6,11 @@ from algorithms.insertion_sort import InsertionSort
 
 
 class IntroSort(Counter):
-    _max_depth: int
-
-    def __init__(self, log_base: int = 2) -> None:
+    def __init__(self, log_multiplier: int = 2) -> None:
         self._heap_sort = HeapSort()
         self._insertion_sort = InsertionSort()
         self._size_threshold = 16
-        self._log_base = log_base
+        self._log_multiplier = log_multiplier
 
     @staticmethod
     def median_of_3(array: list, first: int, middle: int, last: int) -> int:
@@ -49,11 +47,11 @@ class IntroSort(Counter):
         return InsertionSort.insertion_sort(array, start, end)
 
     @staticmethod
-    def introsort(array: list, log_base: int = 2) -> list:
+    def introsort(array: list, log_multiplier: int = 2) -> list:
         n = len(array)
         if n == 0:
             return array
-        max_depth = 2 * ceil(log(n, log_base))
+        max_depth = log_multiplier * ceil(log(n))
         return IntroSort.intro_sort(array, 0, n, 16, max_depth)
 
     def _median_of_3(self, array: list, first: int, middle: int, last: int) -> int:
@@ -67,29 +65,33 @@ class IntroSort(Counter):
         return array[last]
 
     def _partition(self, array: list, low: int, high: int, pivot: int) -> int:
+        k: int
         i, j = low, high
         while True:
+            k = i
             while array[i] < pivot:
-                self._comparisons += 1
                 i += 1
+            self._comparisons += i - k
             j -= 1
+            k = j
             while pivot < array[j]:
-                self._comparisons += 1
                 j -= 1
+            self._comparisons += k - j
             if i >= j:
                 return i
             array[i], array[j] = array[j], array[i]
             self._permutations += 1
             i += 1
 
-    def _intro_sort(self, array: list, start: int, end: int) -> list:
+    def _intro_sort(self, array: list, start: int, end: int, max_depth: int) -> list:
         while end - start > self._size_threshold:
-            if self._max_depth == 0:
+            if max_depth == 0:
+                print('here')
                 return self._heap_sort._heapsort(array)
-            self._max_depth -= 1
+            max_depth -= 1
             pivot = self._median_of_3(array, start, start + ((end - start) // 2) + 1, end - 1)
             p = self._partition(array, start, end, pivot)
-            self._intro_sort(array, p, end)
+            self._intro_sort(array, p, end, max_depth)
             end = p
         return self._insertion_sort._insertion_sort(array, start, end)
 
@@ -97,15 +99,15 @@ class IntroSort(Counter):
         n = len(array)
         if n == 0:
             return array
-        self._max_depth = 2 * ceil(log(n, self._log_base))
-        return self._intro_sort(array, 0, n)
+        max_depth = self._log_multiplier * ceil(log(n))
+        return self._intro_sort(array, 0, n, max_depth)
 
     def sort(self, sequence: list, counting: bool = True) -> list:
-        self._heap_sort._prepare(counting)
-        self._insertion_sort._prepare(counting)
-        self._prepare(counting)
-        sequence = self._introsort(sequence) if counting else self.introsort(sequence)
-        self._end()
+        self._heap_sort.prepare(counting)
+        self._insertion_sort.prepare(counting)
+        self.prepare(counting)
+        sequence = self._introsort(sequence) if counting else self.introsort(sequence, self._log_multiplier)
+        self.end()
         if counting:
             self._permutations += self._heap_sort.permutations + self._insertion_sort.permutations
             self._comparisons += self._heap_sort.comparisons + self._insertion_sort.comparisons

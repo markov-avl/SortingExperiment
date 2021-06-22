@@ -12,8 +12,8 @@ class Experimenter(QThread):
         super().__init__(parent)
         self._algorithms = {
             'Heapsort': HeapSort(),
-            'Introsort (log2(n)-depth)': IntroSort(2),
-            'Introsort (log3(n)-depth)': IntroSort(3)
+            'Introsort (2ln(n)-depth)': IntroSort(2),
+            'Introsort (3ln(n)-depth)': IntroSort(3)
         }
         self._counters = ('permutations', 'comparisons', 'time')
         self.__files = files

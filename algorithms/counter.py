@@ -19,12 +19,12 @@ class Counter(ABC):
     def time(self) -> float:
         return self._time
 
-    def _prepare(self, counting: bool = True) -> None:
+    def prepare(self, counting: bool = True) -> None:
         self._permutations = 0 if counting else -1
         self._comparisons = 0 if counting else -1
         self._time = time()
 
-    def _end(self) -> None:
+    def end(self) -> None:
         self._time = time() - self._time
 
     @abstractmethod

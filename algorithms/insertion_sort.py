@@ -30,7 +30,7 @@ class InsertionSort(Counter):
         return array
 
     def sort(self, sequence: list, counting: bool = True) -> list:
-        self._prepare(counting)
+        self.prepare(counting)
         sequence = self._insertion_sort(sequence) if counting else self.insertion_sort(sequence)
-        self._end()
+        self.end()
         return sequence
