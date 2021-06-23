@@ -86,7 +86,6 @@ class IntroSort(Counter):
     def _intro_sort(self, array: list, start: int, end: int, max_depth: int) -> list:
         while end - start > self._size_threshold:
             if max_depth == 0:
-                print('here')
                 return self._heap_sort._heapsort(array)
             max_depth -= 1
             pivot = self._median_of_3(array, start, start + ((end - start) // 2) + 1, end - 1)

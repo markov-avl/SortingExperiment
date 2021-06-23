@@ -57,13 +57,13 @@ class Experimenter(QThread):
                 self._state_changed(f'Сортировка: {algorithm}\n'
                                     f'Файл: {file_}\n'
                                     f'Эксперимент: подсчет перестановок и сравнений')
-                self._algorithms[algorithm].sort(sequence, True)
+                self._algorithms[algorithm].sort(sequence.copy(), True)
                 self.__results[algorithm]['permutations'].append(self._algorithms[algorithm].permutations)
                 self.__results[algorithm]['comparisons'].append(self._algorithms[algorithm].comparisons)
                 self._state_changed(f'Сортировка: {algorithm}\n'
                                     f'Файл: {file_}\n'
                                     f'Эксперимент: подсчет времени')
-                self._algorithms[algorithm].sort(sequence, False)
+                self._algorithms[algorithm].sort(sequence.copy(), False)
                 self.__results[algorithm]['time'].append(self._algorithms[algorithm].time)
         self._experiment_ended()
 

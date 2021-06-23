@@ -25,8 +25,11 @@ class ExperimentWindow(QWidget):
         self._init_ui()
 
     def _set_layouts(self) -> None:
+        spacer = QWidget()
+        spacer.setFixedSize(2, 1)
         self._upper_layout.addWidget(self._loading, 0)
-        self._upper_layout.addWidget(self._state, 1)
+        self._upper_layout.addWidget(spacer, 1)
+        self._upper_layout.addWidget(self._state, 2)
         self._main_layout.addLayout(self._upper_layout)
         self._main_layout.addWidget(self._cancel, alignment=Qt.AlignRight)
 

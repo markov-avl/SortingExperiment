@@ -1,10 +1,11 @@
+import os
 from random import randint
 
 from PyQt5.QtWidgets import QFileDialog
 
 
 class Generator:
-    OPEN_DIRECTORY = 'Выберите директорию для сохранения теста'
+    OPEN_DIRECTORY = 'Выберите директорию для сохранения последовательности'
     DEFAULT_DIRECTORY = './'
     EXTENSION = '.test'
     _save_directory = None
@@ -15,7 +16,12 @@ class Generator:
     def save_test(self, test_name: str, test: list) -> None:
         directory = QFileDialog.getExistingDirectory(self._parent, self.OPEN_DIRECTORY, self.DEFAULT_DIRECTORY)
         if directory:
+            files = os.listdir(directory)
             path = f'{directory}/{test_name}{len(test)}{self.EXTENSION}'
+            k = 1
+            while path in files:
+                path = f'{directory}/{test_name}{len(test)}({k}){self.EXTENSION}'
+                k += 1
             with open(path, 'w') as outfile:
                 outfile.write(' '.join(map(str, test)))
 
@@ -60,11 +66,13 @@ class Generator:
         test = list()
         if 1 > length or length > 1_000_000:
             length = randint(1, 32)
+        positive = True
         while len(test) < n:
             start = randint(0, 1_000_000)
-            if randint(0, 1):
+            if positive:
                 test.extend([start := start - randint(0, 100) for _ in range(length)])
             else:
                 test.extend([start := start + randint(0, 100) for _ in range(length)])
+            positive = not positive
         test = test[: n]
         self.save_test(f'{length}-partially-sorted-and-reverse-sorted-', test)
