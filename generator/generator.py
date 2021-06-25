@@ -42,37 +42,30 @@ class Generator:
         test = [n] * n
         self.save_test('repetitive-', test)
 
-    def generate_partially_sorted(self, n: int, length: int = None) -> None:
+    def generate_partially_sorted(self, n: int, length: int) -> None:
         test = list()
-        if 1 > length or length > 1_000_000:
-            length = randint(0, 32) + 1
         while len(test) < n:
-            start = randint(0, 1_000_000)
-            test.extend([start := start + randint(0, 100) for _ in range(length)])
+            test.extend(list(range(length)))
         test = test[: n]
         self.save_test(f'{length}-partially-sorted-', test)
 
-    def generate_partially_reverse_sorted(self, n: int, length: int = None) -> None:
+    def generate_partially_reverse_sorted(self, n: int, length: int) -> None:
         test = list()
-        if 1 > length or length > 1_000_000:
-            length = randint(1, 32)
         while len(test) < n:
-            start = randint(0, 1_000_000)
-            test.extend([start := start - randint(0, 100) for _ in range(length)])
+            sequence = list(range(length))
+            sequence.reverse()
+            test.extend(sequence)
         test = test[: n]
         self.save_test(f'{length}-partially-reverse-sorted-', test)
 
-    def generate_partially_sorted_and_reverse_sorted(self, n: int, length: int = None) -> None:
+    def generate_partially_sorted_and_reverse_sorted(self, n: int, length: int) -> None:
         test = list()
-        if 1 > length or length > 1_000_000:
-            length = randint(1, 32)
         positive = True
         while len(test) < n:
-            start = randint(0, 1_000_000)
-            if positive:
-                test.extend([start := start - randint(0, 100) for _ in range(length)])
-            else:
-                test.extend([start := start + randint(0, 100) for _ in range(length)])
+            sequence = list(range(length))
+            if not positive:
+                sequence.reverse()
+            test.extend(sequence)
             positive = not positive
         test = test[: n]
         self.save_test(f'{length}-partially-sorted-and-reverse-sorted-', test)
